@@ -38,4 +38,41 @@ model Model {
   updatedAt      DateTime?    @updatedAt
   typeId         String
   manufacturerId String
+  Asset          Asset[]
+}
+
+model Customer {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  notes     String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  Asset     Asset[]
+}
+
+model Location {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  notes     String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  Asset     Asset[]
+}
+
+model Asset {
+  id             String    @id @default(uuid())
+  name           String    @unique
+  serial         String    @unique
+  status         Boolean   @default(true)
+  entryDate      DateTime?
+  expirationDate DateTime?
+  model          Model     @relation(fields: [modelId], references: [id])
+  location       Location  @relation(fields: [locationId], references: [id])
+  customer       Customer  @relation(fields: [customerId], references: [id])
+  notes          String?
+  createdAt      DateTime? @default(now())
+  updatedAt      DateTime? @updatedAt
+  modelId        String
+  locationId     String
+  customerId     String
 }
