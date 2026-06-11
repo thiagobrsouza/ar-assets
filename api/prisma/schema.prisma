@@ -13,13 +13,62 @@ datasource db {
 }
 
 model Company {
-  id  String @id @default(uuid())
-  name String @unique
-  cnpj String @unique
+  id         String   @id @default(uuid())
+  name       String   @unique
+  cnpj       String   @unique
   isSupplier Boolean
-  notes String? @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("companies")
+}
+
+model Manufacturer {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  notes       String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assetModels AssetModel[]
+
+  @@map("manufacturers")
+}
+
+model Architecture {
+  id         String      @id @default(uuid())
+  name       String      @unique
+  notes      String?     @db.Text
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  assetTypes AssetType[]
+
+  @@map("architectures")
+}
+
+model AssetType {
+  id             String       @id @default(uuid())
+  name           String       @unique
+  architectureId String
+  architecture   Architecture @relation(fields: [architectureId], references: [id])
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  assetModels    AssetModel[]
+
+  @@map("asset_types")
+}
+
+model AssetModel {
+  id             String       @id @default(uuid())
+  name           String       @unique
+  assetTypeId    String
+  assetType      AssetType    @relation(fields: [assetTypeId], references: [id])
+  manufacturerId String
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("asset_models")
 }

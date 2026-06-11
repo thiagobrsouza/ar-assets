@@ -16,9 +16,6 @@ companyRouter.get('/companies', async (req, res) => {
 
 companyRouter.get('/companies/:id', async (req, res) => {
     const company = await service.findById(req.params.id);
-    if (!company) {
-        return res.status(404).json({ message: 'Empresa não encontrada!' });
-    }
     res.json(company);
 });
 
