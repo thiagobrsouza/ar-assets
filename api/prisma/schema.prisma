@@ -13,13 +13,16 @@ datasource db {
 }
 
 model Company {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  cnpj       String   @unique
+  id         String     @id @default(uuid())
+  name       String     @unique
+  cnpj       String     @unique
   isSupplier Boolean
-  notes      String?  @db.Text
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  notes      String?    @db.Text
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  assets     Asset[]
+  licenses   License[]
+  locations  Location[]
 
   @@map("companies")
 }
@@ -69,6 +72,102 @@ model AssetModel {
   notes          String?      @db.Text
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  assets         Asset[]
+  licenses       License[]
 
   @@map("asset_models")
+}
+
+model Location {
+  id        String  @id @default(uuid())
+  name      String
+  company   Company @relation(fields: [companyId], references: [id])
+  notes     String? @db.Text
+  companyId String
+
+  @@map("locations")
+}
+
+enum Status {
+  ATIVO
+  ARQUIVADO
+  DESPACHADO
+  DEFEITUOSO
+}
+
+model Asset {
+  id               String            @id @default(uuid())
+  name             String            @unique
+  status           Status
+  serialNumber     String            @unique
+  company          Company           @relation(fields: [companyId], references: [id])
+  model            AssetModel        @relation(fields: [assetModelId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id])
+  entryDate        DateTime?
+  expirationDate   DateTime?
+  notes            String?           @db.Text
+  companyId        String
+  assetModelId     String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userId           String?
+  licenseCheckouts LicenseCheckout[]
+
+  @@map("assets")
+}
+
+model License {
+  id             String     @id @default(uuid())
+  name           String     @unique
+  status         Status
+  serialKey      String
+  quantity       Int?
+  model          AssetModel @relation(fields: [assetModelId], references: [id])
+  supplier       Company?   @relation(fields: [companyId], references: [id])
+  entryDate      DateTime?
+  expirationDate DateTime?
+  notes          String?    @db.Text
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  assetModelId     String
+  companyId        String
+  licenseCheckouts LicenseCheckout[]
+
+  @@map("licenses")
+}
+
+model LicenseCheckout {
+  id           String    @id @default(uuid())
+  license      License   @relation(fields: [licenseId], references: [id])
+  licenseId    String
+  asset        Asset     @relation(fields: [assetId], references: [id])
+  assetId      String
+  checkedOutAt DateTime  @default(now())
+  checkedInAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("license_checkouts")
+}
+
+enum Role {
+  ADMINISTRADOR
+  GERENTE
+  CONTROLADOR
+  LEITURA
+  ASSOCIATIVO
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  username  String   @unique
+  password  String?
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  assets    Asset[]
+
+  @@map("users")
 }

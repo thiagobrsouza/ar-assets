@@ -19,10 +19,10 @@ export class AssetTypeService {
     }
 
     async findAll() {
-        const companies = await prisma.assetType.findMany({
+        const assetTypes = await prisma.assetType.findMany({
             include: {architecture: true}
         });
-        return companies;
+        return assetTypes;
     }
 
     async findById(id: string) {

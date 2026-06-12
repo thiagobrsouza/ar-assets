@@ -19,8 +19,8 @@ export class ManufacturerService {
     }
 
     async findAll() {
-        const companies = await prisma.manufacturer.findMany();
-        return companies;
+        const manufacturers = await prisma.manufacturer.findMany();
+        return manufacturers;
     }
 
     async findById(id: string) {
